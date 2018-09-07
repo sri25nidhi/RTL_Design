@@ -1,0 +1,99 @@
+// top_alu.vp
+
+//;
+//; use strict ;                   # Use a strict interpretation
+//; use warnings FATAL=>qw(all);   # Turn warnings into errors
+//; use diagnostics ;              # Print helpful info, for errors
+//;
+
+
+/*
+ 10101 LTE   rhs0 <= rhs1
+ 01101 GT    rhs0 >  rhs1
+ 10110 GTE   rhs0 >= rhs1
+ 01110 LT    rhs0 <  rhs1
+ 00101 LSUB  rhs1 -  rhs0
+ 00110 SUB   rhs0 -  rhs1
+ 00000 ADD   rhs0 +  rhs1 
+*/
+
+module `mname` ();
+
+   //; my $dut = generate_base( "alu","my_alu");
+   //; my $bW = $dut->get_param("bitWidth");
+   //; $bW == 16 or die "must be 16 for HW1";
+
+   logic [`$bW-1`:0] rhs_0;
+   logic [`$bW-1`:0] rhs_1;
+   logic [4:0] 	     rhs_2;
+   
+   logic [`$bW-1`:0] lhs_0; 
+   logic [`$bW-1`:0] lhs_gold; 
+
+   logic 	     clk;
+
+   int 		     op_sel;
+   
+   
+   `$dut->instantiate()`(.*);
+    
+   // A clock for sequencing
+   initial begin 
+      clk = 1'b0 ;
+      while(1) begin
+	 #500 clk = 1'b0 ;
+	 #500 clk = 1'b1 ;
+      end
+   end
+   
+
+   // How long should our test run 
+   initial begin
+      repeat(1000) @(posedge clk) ; 
+      $finish(1) ; 
+   end
+   
+   //Driver Model
+   always @(negedge clk) begin
+      rhs_0 = $random();
+      rhs_1 = $random();
+      op_sel = $random() % 7 ;
+      op_sel = op_sel > 0 ? op_sel : -op_sel ;
+      
+      case(op_sel)
+	0: rhs_2 = 5'b10101;
+	1: rhs_2 = 5'b01101;
+	2: rhs_2 = 5'b10110;
+	3: rhs_2 = 5'b01110;
+	4: rhs_2 = 5'b00101;
+	5: rhs_2 = 5'b00110;
+       	6: rhs_2 = 5'b00000;	
+      endcase
+      case(op_sel)
+	0: lhs_gold =  rhs_0 <= rhs_1 ;
+	1: lhs_gold =  rhs_0 >  rhs_1 ;
+	2: lhs_gold =  rhs_0 >= rhs_1 ;
+	3: lhs_gold =  rhs_0 <  rhs_1 ;
+	4: lhs_gold =  rhs_1 -  rhs_0 ;
+	5: lhs_gold =  rhs_0 -  rhs_1 ;
+	6: lhs_gold =  rhs_0 +  rhs_1 ;		   
+      endcase
+
+   end
+   
+   //Test
+   always @(posedge clk) begin
+      #1;
+      isGolden:     assert( lhs_0 == lhs_gold ) ;
+   end
+
+   //Monitor
+//   always @(posedge clk) begin
+//      #1 ;
+//      $write( " %d (%1d %5b)  %d ", rhs_0, op_sel, rhs_2 , rhs_1) ;
+//      $write( " -->" );
+//      $write( " %d (%d)", lhs_0, lhs_gold);
+//      $write("\n");
+//   end
+
+endmodule
