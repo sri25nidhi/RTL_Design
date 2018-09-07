@@ -1,0 +1,79 @@
+// top_ror.vp
+
+//;
+//; use strict ;                   # Use a strict interpretation
+//; use warnings FATAL=>qw(all);   # Turn warnings into errors
+//; use diagnostics ;              # Print helpful info, for errors
+//;
+
+
+module `mname` ();
+
+   //; my $dut = generate_base( "ror","my_ror");
+   //; my $bW = $dut->get_param("bitWidth");
+   //; my $aW = $dut->get_param("shiftWidth");
+   //; $bW == 16 or die "must be 16 for HW1";
+   //; $aW == 4  or die "must be 4 for HW1";
+
+   logic [`$bW-1`:0] a,z, z_gold;
+   logic [`$aW-1`:0]   b;
+   logic 	    clk;
+
+   `$dut->instantiate()`(.*);
+  
+   // A clock for sequencing
+   initial begin 
+      clk = 1'b0 ;
+      while(1) begin
+	 #500 clk = 1'b0 ;
+	 #500 clk = 1'b1 ;
+      end
+   end
+   
+   // How long should our test run 
+   initial begin
+      repeat(1000) @(posedge clk) ; 
+      $finish(1) ; 
+   end
+   
+   //Driver Model
+   always @(negedge clk) begin
+      a = $random();
+      b = $random();
+      z_gold = a ;
+      for( int i=0 ; i<b ; i++ )
+	z_gold = {z_gold[0],z_gold[`$bW-1`:1]};	 
+   end
+   
+   //Test
+   always @(posedge clk) begin
+      #1;
+      isGolden:     assert( z == z_gold ) ;
+   end
+
+   //Monitor
+//   always @(posedge clk) begin
+//      #1 ;
+//      $write( " %b ror %d ", a , b ) ;
+//      $write( " -->" );
+//      $write( " %b (%b)", z, z_gold);
+//      $write("\n");
+//   end
+
+
+
+   //Capture the waves in top_HelloWorld.vp
+   //; my $region = mname;
+   initial begin
+      // if this is a "+wave" run, it must record all signals
+      if ( $test$plusargs("wave") ) begin
+         $display("%t: Starting Wave Capture",$time);
+         //         levels,    instance
+         $vcdpluson(0,       `$region` );
+         $vcdplusmemon(0,    `$region` );
+      end
+   end // initial begin
+   
+   
+endmodule
+  
