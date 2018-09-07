@@ -1,0 +1,29 @@
+//priEnc.vp
+//;
+//; use strict ;                   # Use a strict interpretation
+//; use warnings FATAL=>qw(all);   # Turn warnings into errors
+//; use diagnostics ;              # Print helpful info, for errors
+//;
+
+//; my $bW = parameter( name=>"bitWidth", val=>10) ;
+//; my $rv = parameter( name=>"Reverse", val=>0, list=>[0,1]);
+//; my $i = $bW -1;
+module `mname`
+   (
+    input  logic [`$bW-1`:0] a,
+    output logic [`$bW-1`:0] z 
+    );
+	
+     
+     always_comb begin
+	z = `$bW`'b0;
+	priority case(1'b1)
+		//; for (my $i=0; $i <= $bW-1; $i++) {
+		a[`$bW-$i-1`] : z[`$bW-$i-1`] = 1'b1; 
+		//;}
+	endcase
+    end
+   
+
+
+endmodule 
