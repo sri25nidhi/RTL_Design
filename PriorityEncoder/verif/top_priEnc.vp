@@ -1,0 +1,75 @@
+// top_priEnc.vp
+
+//;
+//; use strict ;                   # Use a strict interpretation
+//; use warnings FATAL=>qw(all);   # Turn warnings into errors
+//; use diagnostics ;              # Print helpful info, for errors
+//;
+
+
+module `mname` ();
+
+   //; my $dut = generate_base( "priEnc","my_priEnc");
+   //; my $bW = $dut->get_param("bitWidth");
+   //; $bW == 10 or die "must be 10 for HW1";
+
+   logic [`$bW-1`:0] a,z;
+   logic 	    clk ;
+
+   `$dut->instantiate()`(.*);
+  
+   // A clock for sequencing
+   initial begin 
+      clk = 1'b0 ;
+      while(1) begin
+	 #500 clk = 1'b0 ;
+	 #500 clk = 1'b1 ;
+      end
+   end
+   
+   // How long should our test run 
+   initial begin
+      repeat(10) @(posedge clk) ; 
+      $finish(1) ; 
+   end
+   
+   //Driver Model
+   always @(negedge clk) begin
+      a = $random();
+   end
+   
+   //Test
+   always @(posedge clk) begin
+      #1;
+      noz:       assert( ! $isunknown(z) ) ;
+      ValidWin:  assert( $onehot( z&a ) || (a=='0 && z=='0)); //Valid vote or zero
+      SigWin_00: assert( z > (a&(~z))   || (a=='0 && z=='0)); //most sig or zero 
+      SigWin_01: assert( z <= a );  // most sig
+   end
+
+   //Monitor
+//   always @(posedge clk) begin
+//      #1 ;
+//      $write( " %b", a) ;
+//      $write( " -->" );
+//      $write( " %b", z);
+//      $write("\n");
+//   end
+
+
+
+   //Capture the waves in top_HelloWorld.vp
+   //; my $region = mname;
+   initial begin
+      // if this is a "+wave" run, it must record all signals
+      if ( $test$plusargs("wave") ) begin
+         $display("%t: Starting Wave Capture",$time);
+         //         levels,    instance
+         $vcdpluson(0,       `$region` );
+         $vcdplusmemon(0,    `$region` );
+      end
+   end // initial begin
+   
+   
+endmodule
+  
