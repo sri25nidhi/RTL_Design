@@ -1,0 +1,40 @@
+//alu.vp
+//;
+//; use strict ;                   # Use a strict interpretation
+//; use warnings FATAL=>qw(all);   # Turn warnings into errors
+//; use diagnostics ;              # Print helpful info, for errors
+
+//; my $bW = parameter( name=>"bitWidth", val=>16,doc=>"Width of Data");
+
+/*
+ 10101 LTE   rhs_0 <= rhs_1
+ 01101 GT    rhs_0 >  rhs_1
+ 10110 GTE   rhs_0 >= rhs_1
+ 01110 LT    rhs_0 <  rhs_1
+ 00101 LSUB  rhs_1 -  rhs_0
+ 00110 SUB   rhs_0 -  rhs_1
+ 00000 ADD   rhs_0 +  rhs_1 
+*/
+
+module `mname`
+(
+   input  logic  [`$bW-1`:0] rhs_0,
+   input  logic  [`$bW-1`:0] rhs_1,
+   input  logic        [4:0]       rhs_2,
+   
+   output logic  [`$bW-1`:0] lhs_0 
+);
+
+  always_comb begin
+    unique case(rhs_2) 
+        5'b10101 : lhs_0 = (rhs_0 <= rhs_1) ? 1 : 0;
+        5'b01101 : lhs_0 = (rhs_0 > rhs_1) ? 1 : 0;
+        5'b10110 : lhs_0 = (rhs_0 >= rhs_1) ? 1 : 0;
+        5'b01110 : lhs_0 = (rhs_0 < rhs_1) ? 1 : 0;
+        5'b00101 : lhs_0 = rhs_1 - rhs_0;
+        5'b00110 : lhs_0 = rhs_0 - rhs_1;
+        5'b00000 : lhs_0 = rhs_0 + rhs_1;
+        default  : lhs_0 = 0;
+    endcase
+  end
+endmodule   
