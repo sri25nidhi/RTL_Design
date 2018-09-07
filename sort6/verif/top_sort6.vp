@@ -1,0 +1,63 @@
+//top_sort6.vp
+
+//; my $bW = 16;
+//; my $eC = 6;
+
+module `mname`();
+   
+   // Our DUT signals that string match the portnames of maxSix
+   logic [`$bW-1`:0] A[`$eC-1`:0] ;
+   logic [`$bW-1`:0] Z[`$eC-1`:0] ;
+
+   // The DUT
+   //; my $dut = generate("sort6","my_sort6");
+   `$dut->instantiate()`(.*);
+
+// Some stimulus for top_HelloWorld.vp
+   initial begin
+         
+      for( int i = 0 ; i < 50000 ; i++) begin
+	 //; for(my $j=0 ; $j < $eC ; $j++){
+         A[`$j`] = $random();
+         //; }
+	 #100 ;
+      end
+            
+      $finish();
+   end
+
+   //A quick check:
+   always @* begin
+      #10;
+      
+      //; foreach my $i (("A","Z")) {
+      //;    for( my $j=0 ; $j < $eC ; $j++ ) {
+     
+      //$write( "%5d " , `$i`[`$j`] );
+      
+      //;    }
+      //$write( "--->");
+      //; }
+      //$display("");
+      
+
+      // Check that output is sorted
+      noz_0: assert(!$isunknown(Z[0]));
+      //; for( my $i = 1 ; $i < $eC ; $i++ ){
+      srt_`$i`: assert(Z[`$i`]>=Z[`$i-1`]);
+      noz_`$i`: assert(!$isunknown(Z[`$i`]));
+      //; }
+
+      // Check that output contains the input
+      //; for( my $i = 0 ; $i < $eC ; $i++ ){
+      drop_`$i`:
+      assert(  |{
+		 //; for(my $j =0 ; $j<$eC-1 ; $j++ ){
+		 (A[`$i`]==Z[`$j`]),
+		 //; }
+		 (A[`$i`]==Z[`$eC-1`])
+		 });
+      //; }
+   end
+   
+endmodule
