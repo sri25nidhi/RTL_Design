@@ -1,0 +1,33 @@
+//integrator.vp
+
+//; use strict ;
+
+//integrator.vp
+//; my $bW = 8 ;
+//; my $sW = 16 ;
+//; my $eC = 8 ;
+
+module `mname`
+  (  input logic  [`$bW-1`:0] d,
+     input logic 	      d_vld, //d is valid
+     output logic 	      d_rdy, //rdy for d
+     
+     output logic [`$sW-1`:0] sum,
+     output logic 	      sum_vld, //sum is valid
+     input logic 	      sum_rdy, //rdy for sum
+
+     input logic 	      clk,
+     input logic 	      rst  );
+
+
+always_comb begin
+
+
+
+end
+
+always_ff begin
+
+end
+
+endmodule 
