@@ -1,0 +1,52 @@
+//progPattern.vp
+
+//; use strict ;
+//; use warnings ;
+
+
+module `mname` 
+  (
+   input logic 	     a ,
+   input logic [3:0] pattern,
+   output logic      match,
+   input logic 	     clk,
+   input logic 	     rst 
+   );
+
+   logic [3:0] hist; 
+   logic      match_temp;
+   
+   logic en;
+
+   assign en = 1'b1;
+	
+   
+   //; my $dff_mod_input  = generate("dff","my_dff1");	
+   //; my $dff_mod_output = generate("dff","my_dff2");
+   
+   `$dff_mod_input->instantiate` (.d(a), .clk(clk), .rst(rst), .en(en), .q(a_q));
+	
+   
+   always_comb begin
+		match_temp = 1'b0;
+		hist  = 5'd0;
+		hist = rst ? {hist[2:0],a_q} : '0;
+		priority case(1'b1)
+			
+			!rst : begin
+					hist = 'b0;
+					match_temp = 'b0;
+					end
+					
+			hist[3:0] == pattern : match_temp = 1'b1;
+			
+			default : match_temp = 1'b0;
+		endcase
+   end
+   
+     `$dff_mod_output->instantiate` (.d(match_temp), .clk(clk), .rst(rst), .en(en), .q(match));
+
+   
+endmodule
+
+
