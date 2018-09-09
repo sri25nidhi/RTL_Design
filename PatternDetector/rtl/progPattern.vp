@@ -13,39 +13,24 @@ module `mname`
    input logic 	     rst 
    );
 
-   logic [3:0] hist; 
-   logic      match_temp;
    
    logic en;
 
    assign en = 1'b1;
-	
+   logic 	     a_q1, a_q2, a_q3, a_q4;
    
-   //; my $dff_mod_input  = generate("dff","my_dff1");	
-   //; my $dff_mod_output = generate("dff","my_dff2");
+   //; my $dff_mod_input1  = generate("dff","my_dff1");	
+   //; my $dff_mod_input2  = generate("dff","my_dff2");	
+   //; my $dff_mod_input3  = generate("dff","my_dff3");	
+   //; my $dff_mod_input4  = generate("dff","my_dff4");	
    
-   `$dff_mod_input->instantiate` (.d(a), .clk(clk), .rst(rst), .en(en), .q(a_q));
-	
    
-   always_comb begin
-		match_temp = 1'b0;
-		hist  = 5'd0;
-		hist = rst ? {hist[2:0],a_q} : '0;
-		priority case(1'b1)
-			
-			!rst : begin
-					hist = 'b0;
-					match_temp = 'b0;
-					end
-					
-			hist[3:0] == pattern : match_temp = 1'b1;
-			
-			default : match_temp = 1'b0;
-		endcase
-   end
-   
-     `$dff_mod_output->instantiate` (.d(match_temp), .clk(clk), .rst(rst), .en(en), .q(match));
+   `$dff_mod_input1->instantiate` (.d(a), .clk(clk), .rst(rst), .en(en), .q(a_q1));
+   `$dff_mod_input2->instantiate` (.d(a_q1), .clk(clk), .rst(rst), .en(en), .q(a_q2));
+   `$dff_mod_input3->instantiate` (.d(a_q2), .clk(clk), .rst(rst), .en(en), .q(a_q3));
+   `$dff_mod_input4->instantiate` (.d(a_q3), .clk(clk), .rst(rst), .en(en), .q(a_q4));
 
+   assign match = ({a_q4, a_q3, a_q2, a_q1} == pattern) && rst ? 1'b1 : 1'b0;
    
 endmodule
 
