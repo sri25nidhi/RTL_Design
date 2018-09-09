@@ -18,16 +18,42 @@ module `mname`
 
      input logic 	      clk,
      input logic 	      rst  );
+	
+	logic en;
+	logic [2:0] count;
 
-
-always_comb begin
-
-
-
-end
-
-always_ff begin
-
-end
-
+	assign en = 1'b1;
+	
+	logic [`$bW-1`:0] q;
+	logic [`$sW-1`:0] sum_temp;
+	logic [`$sW-1`:0] sum_ff;
+	
+	
+	//; my $dff_mod_input  = generate("dff","my_dff1");	
+	//; my $dff_mod_output = generate("dff","my_dff2");	
+	`$dff_mod_input->instantiate` (.d(d), .clk(clk), .rst(rst), .en(en), .q(q));
+	
+	always_comb begin
+		sum_ff = 0;
+	 	count = 3'b0;
+	 	d_rdy = 1'b1;
+		unique case(1'b1)
+			d_vld && d_rdy && (count < 8) :
+				begin
+					sum_ff = sum_ff + q;
+					count = count + 1;
+				end
+			count == 8  && sum_rdy : 
+				begin
+					d_rdy = 'b0;
+					sum_vld = 'b1;
+					sum_ff = 'b0;
+					count = 'b0;
+				end 
+			default : sum_ff = 'b0;
+		endcase	
+	end
+	
+	`$dff_mod_output->instantiate` (.d(sum_ff), .clk(clk), .rst(rst), .en(en), .q(sum));
+	
 endmodule 
