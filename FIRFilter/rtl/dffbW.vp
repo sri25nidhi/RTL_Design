@@ -1,0 +1,25 @@
+//dffbW.vp
+
+//; use strict ;
+
+//; my $bW = 8 ;
+
+
+module `mname`
+  (  input logic  [`$bW-1`:0] d,
+	 output logic [`$bW-1`:0] q,
+     input logic 	      clk,
+     input logic 	      rst,
+	 input logic en
+	 );
+	 
+	 always_ff @(posedge clk) begin
+		priority case (1'b1)
+			!rst : q <= `$bW`'d0 ;
+			en   : q <= d ;
+		endcase
+		
+	 end
+	 	 
+	 
+	 endmodule
