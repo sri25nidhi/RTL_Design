@@ -1,0 +1,50 @@
+// fir.vp
+
+//; use strict ;
+//; use warnings ;
+
+//; my $bW = 8 ;
+//; my $hC = 5 ;
+
+module `mname`
+   ( 
+     input  logic [`$bW-1`:0] x,
+     output logic [`$bW-1`:0] y,
+
+     input logic           clk,
+     input logic           rst
+     );
+
+   logic en;
+   logic   [`$bW-1`:0] y_ff;
+   logic [`2*$bW`] sum_div;
+
+   assign en = 1'b1;
+   logic 	[`$bW-1`:0] x_q1, x_q2, x_q3, x_q4, x_q5;
+    
+   //; my $dff_mod_input1  = generate("dffbW","my_dff1");	
+   //; my $dff_mod_input2  = generate("dffbW","my_dff2");	
+   //; my $dff_mod_input3  = generate("dffbW","my_dff3");	
+   //; my $dff_mod_input4  = generate("dffbW","my_dff4");	
+   //; my $dff_mod_input5  = generate("dffbW","my_dff5");
+   
+   //; my $dff_mod_output  = generate("dffbW","my_dff6");
+   
+   `$dff_mod_input1->instantiate` (.d(x), .clk(clk), .rst(rst), .en(en), .q(x_q1));
+   `$dff_mod_input2->instantiate` (.d(x_q1), .clk(clk), .rst(rst), .en(en), .q(x_q2));
+   `$dff_mod_input3->instantiate` (.d(x_q2), .clk(clk), .rst(rst), .en(en), .q(x_q3));
+   `$dff_mod_input4->instantiate` (.d(x_q3), .clk(clk), .rst(rst), .en(en), .q(x_q4));
+   `$dff_mod_input5->instantiate` (.d(x_q4), .clk(clk), .rst(rst), .en(en), .q(x_q5));
+   
+   always_comb begin 
+		unique case(1'b1)
+			rst : 
+				begin 
+					sum_div = (x_q1 + x_q2 + x_q3 + x_q4 + x_q5);
+					y = sum_div >> 3;
+				end
+		endcase
+		
+   end
+	
+endmodule // fir
